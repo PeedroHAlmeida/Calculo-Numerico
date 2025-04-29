@@ -1,3 +1,13 @@
+---
+title: "Trabalho Prático 1 - Cálculo Numérico"
+author: 
+  - Maria Luiza Alvez Belarmino
+  - Pedro Henrique de Almeida 
+output: 
+  pdf_document:
+    latex_engine: xelatex
+---
+
 ####################################################################
 #                                                                  #
 # UNIFAL - Universidade Federal de Alfenas                         #
