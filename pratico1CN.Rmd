@@ -24,7 +24,7 @@ output:
 
 # # # # # # # Questão 1 # # # # # # #
 
-# Considere q(x) = 816x^3 − 3835x^2 + 6000x − 3125 e p(x) = q(x + ω), onde ω é a
+# Considere q(x) = 816x^3 − 3835x^2 + 6000x − 3125 e p(x) = q(x + w), onde w é a
 # média aritméticado último dígito da matrícula da dupla que faz o trabalho.
 
 # # # (a) # # #
@@ -48,7 +48,7 @@ raizes
 ```
 
 # # # (b) # # #
-# Faça o gráfico de p(x) para (1,43 − ω) ≤ x ≤ (1,71 − ω). Mostre onde se 
+# Faça o gráfico de p(x) para (1,43 − w) <= x <= (1,71 − w). Mostre onde se 
 # localizam os zeros de p(x)
 
 ```{r}
@@ -81,7 +81,7 @@ text(raiz2, rep(0, length(raiz2)) + 0.1,
 ```
 
 # # # (c) # # #
-# Começando com x0 = (1,5 − ω), o que o Método de Newton-Raphson faz?
+# Começando com x0 = (1,5 − w), o que o Método de Newton-Raphson faz?
 
 ```{r}
 p_derivada <- deriv(p)
@@ -126,7 +126,7 @@ cat("\nRaiz aproximada por Newton-Raphson:", raiz_aproximada, "\n")
 ```
 
 # # # (d) # # #
-# Começando com x0 = −ω e x1 = (1 − ω), o que o Método da Secante faz?
+# Começando com x0 = −w e x1 = (1 − w), o que o Método da Secante faz?
 
 ```{r}
 # Função secante
@@ -168,7 +168,7 @@ cat("\nRaiz aproximada pela secante:", raiz_secante, "\n")
 ```
 
 # # # (e) # # #
-# Começando no intervalo [1 − ω, 2 − ω], o que o Método da Bissecçao faz?
+# Começando no intervalo [1 − w, 2 − w], o que o Método da Bissecçao faz?
 
 ```{r}
 # Função Bissecção
