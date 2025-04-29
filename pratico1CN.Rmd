@@ -1,0 +1,208 @@
+####################################################################
+#                                                                  #
+# UNIFAL - Universidade Federal de Alfenas                         #
+# BACHARELADO EM CIÊNCIA DA COMPUTAÇÃO                             #
+# Trabalho....: Prático 1                                          #
+# Disciplina..: Cálculo Numérico                                   #
+# Professora..: Angela Leite Moreno                                #
+# Alunos......: Maria Luiza Alves Belarmino - 2023.1.08.015        #
+#               Pedro Henrique de Alemida - 2022.1.08.045          #
+# Data........: 30 de abril de 2025                                #
+#                                                                  #  
+####################################################################                              
+
+
+# # # # # # # Questão 1 # # # # # # #
+
+# Considere q(x) = 816x^3 − 3835x^2 + 6000x − 3125 e p(x) = q(x + ω), onde ω é a
+# média aritméticado último dígito da matrícula da dupla que faz o trabalho.
+
+# # # (a) # # #
+# Quais são as raízes de p(x)?
+
+```{r}
+# Biblioteca para polinomios
+library(polynom)
+
+# valor de omega dado que o numero final das matriculas
+omega <- (5 + 5) / 2
+
+p <- 816 * (polynomial(c(5,1)))^3 -
+  3835 * (polynomial(c(5,1)))^2 +
+  6000 * (polynomial(c(5,1))) -
+  3125
+
+# raizes de p(x)
+raizes <- solve(p)
+raizes
+```
+
+# # # (b) # # #
+# Faça o gráfico de p(x) para (1,43 − ω) ≤ x ≤ (1,71 − ω). Mostre onde se 
+# localizam os zeros de p(x)
+
+```{r}
+# Intervalo para o gráfico
+x_min <- 1.43 - omega
+x_max <- 1.71 - omega  
+
+# Vetor dos valores de x e y
+x_vals <- seq(x_min, x_max, length.out = 500)
+y_vals <- predict(p, x_vals)
+
+# Grafico
+plot(x_vals, y_vals, type = "l", lwd = 2,
+     main = bquote(p(x) ~ "no intervalo" ~ .(round(x_min, 2)) <= x ~ leq ~ .(round(x_max, 2))),
+     xlab = "x", ylab = "p(x)")
+abline(h = 0, col = "gray") 
+
+# Pontos nos valores 0 do grafico
+raizes_no_intervalo <- raizes[raizes >= x_min & raizes <= x_max]
+points(raizes_no_intervalo, rep(0, length(raizes_no_intervalo)), col = "red", pch = 19)
+
+# Valor das raizes melhor posicionado
+raizes1e3 <- raizes[c(1, 3)]
+text(raizes1e3, rep(0, length(raizes1e3)) + 0.1, 
+     labels = round(raizes1e3, 4), pos = 2, col = "red")
+
+raiz2 <- raizes[2]
+text(raiz2, rep(0, length(raiz2)) + 0.1, 
+     labels = round(raiz2, 4), pos = 4, col = "red")
+```
+
+# # # (c) # # #
+# Começando com x0 = (1,5 − ω), o que o Método de Newton-Raphson faz?
+
+```{r}
+p_derivada <- deriv(p)
+
+x0 <- 1.5 - omega
+# tolerância para parada
+tol <- 1e-6 
+max_iter <- 100 
+
+# Função Newton-Raphson
+newton_raphson <- function(p, p_derivada, x0, tol, max_iter) {
+  x <- x0
+  for (i in 1:max_iter) {
+    fx <- predict(p, x)
+    dfx <- predict(p_derivada, x)
+    
+    if (abs(dfx) < 1e-10) {
+      cat("Derivada próxima de zero!\n")
+      return(NA)
+    }
+    
+    x_new <- x - fx / dfx
+    
+    cat(sprintf("Iteração %d: x = %.10f, p(x) = %.10f\n", i, x_new, predict(p, x_new)))
+    
+    if (abs(x_new - x) < tol) {
+      cat(sprintf("\nConvergiu em %d iterações.\n", i))
+      return(x_new)
+    }
+    
+    x <- x_new
+  }
+  cat("Número máximo de iterações atingido.\n")
+  return(x)
+}
+
+# Chamada da função
+raiz_aproximada <- newton_raphson(p, p_derivada, x0, tol, max_iter)
+
+# Saida da resposta aproximada
+cat("\nRaiz aproximada por Newton-Raphson:", raiz_aproximada, "\n")
+```
+
+# # # (d) # # #
+# Começando com x0 = −ω e x1 = (1 − ω), o que o Método da Secante faz?
+
+```{r}
+# Função secante
+secante <- function(p, x0, x1, tol, max_iter) {
+  for (i in 1:max_iter) {
+    fx0 <- predict(p, x0)
+    fx1 <- predict(p, x1)
+    
+    if (abs(fx1 - fx0) < 1e-10) {
+      cat("Diferença muito pequena!\n")
+      return(NA)
+    }
+    
+    x2 <- x1 - fx1 * (x1 - x0) / (fx1 - fx0)
+    
+    cat(sprintf("Iteração %d: x = %.10f, p(x) = %.10f\n", i, x2, predict(p, x2)))
+    
+    if (abs(x2 - x1) < tol) {
+      cat(sprintf("\nConvergiu em %d iterações.\n", i))
+      return(x2)
+    }
+    
+    x0 <- x1
+    x1 <- x2
+  }
+  cat("Número máximo de iterações atingido.\n")
+  return(x2)
+}
+
+# Definições iniciais
+x0 <- -omega
+x1 <- 1 - omega
+
+# Chamada da função
+raiz_secante <- secante(p, x0, x1, tol, max_iter)
+
+# Saida da resposta aproximada
+cat("\nRaiz aproximada pela secante:", raiz_secante, "\n")
+```
+
+# # # (e) # # #
+# Começando no intervalo [1 − ω, 2 − ω], o que o Método da Bissecçao faz?
+
+```{r}
+# Função Bissecção
+bisseccao <- function(p, a, b, tol, max_iter) {
+  fa <- predict(p, a)
+  fb <- predict(p, b)
+  
+  if (fa * fb > 0) {
+    cat("Erro: p(a) e p(b) têm o mesmo sinal!\n")
+    return(NA)
+  }
+  
+  for (i in 1:max_iter) {
+    c <- (a + b) / 2
+    fc <- predict(p, c)
+    
+    cat(sprintf("Iteração %d: c = %.10f, p(c) = %.10f\n", i, c, fc))
+    
+    if (abs(fc) < tol || abs(b - a) < tol) {
+      cat(sprintf("\nConvergiu em %d iterações.\n", i))
+      return(c)
+    }
+    
+    if (fa * fc < 0) {
+      b <- c
+      fb <- fc
+    } else {
+      a <- c
+      fa <- fc
+    }
+  }
+  cat("Número máximo de iterações atingido.\n")
+  return((a + b) / 2)
+}
+
+# Definições iniciais
+a <- 1 - omega  
+b <- 2 - omega  
+
+# Chamada da função
+raiz_bisseccao <- bisseccao(p, a, b, tol, max_iter)
+
+# Saida da resposta aproximada
+cat("\nRaiz aproximada pela bissecção:", raiz_bisseccao, "\n")
+
+```
+
